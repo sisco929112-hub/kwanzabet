@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="pt-PT" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mines — Desafio de aniversário</title>
+  <meta name="description" content="Cinco partidas gratuitas de Mines num desafio independente de aniversário em Angola.">
+  <!-- Anti-cache meta tags -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  
+  <link rel="icon" href="https://mines-angola.lovable.app/favicon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Panda Video Player API v2 -->
+  <script async src="https://player.pandavideo.com.br/api.v2.js"></script>
+
+  <style>
+    :root {
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --radius: 0.625rem;
+      --background: oklch(16% 0.025 265);
+      --foreground: oklch(97% 0.005 260);
+      --card: oklch(22% 0.03 265);
+      --card-foreground: oklch(97% 0.005 260);
+      --primary: oklch(90.2% 0.2 111.6);
+      --primary-foreground: oklch(18% 0.03 265);
+      --secondary: oklch(26% 0.035 265);
+      --muted: oklch(26% 0.035 265);
+      --muted-foreground: oklch(72% 0.02 260);
+      --accent: oklch(90.2% 0.2 111.6);
+      --accent-foreground: oklch(18% 0.03 265);
+      --destructive: oklch(65% 0.21 22);
+      --destructive-foreground: oklch(98% 0.005 260);
+      --border: oklch(32% 0.035 265);
+      --closed: oklch(47.5% 0.235 264.2);
+      --safe: oklch(70% 0.22 145);
+      --shadow-panel: 0 24px 60px -30px oklch(0% 0 0 / 0.9);
+      --shadow-glow: 0 0 28px -4px oklch(83% 0.17 88 / 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-sans);
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background-color: var(--background);
+      color: var(--foreground);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Page Layout - Centered Container for Desktop & Mobile */
+    .page-layout {
+      min-height: 100vh;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .event-bg {
+      background: radial-gradient(circle at 50% 18%, oklch(47.5% 0.235 264.2 / 0.25) 0%, transparent 40%),
+                  radial-gradient(circle at 50% 68%, oklch(70% 0.22 145 / 0.15) 0%, transparent 35%),
+                  var(--background);
+    }
+
+    .mines-bg {
+      background: radial-gradient(60% 50% at 50% 0%, oklch(28% 0.06 265 / 0.9), transparent 70%),
+                  radial-gradient(50% 40% at 85% 100%, oklch(32% 0.09 150 / 0.35), transparent 70%),
+                  var(--background);
+    }
+
+    .app-card {
+      width: 100%;
+      max-width: 440px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Typography */
+    h1.hero-title {
+      font-size: 1.85rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--foreground);
+      margin-bottom: 0.5rem;
+      user-select: none;
+    }
+
+    .promo-badge {
+      width: 100%;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 0;
+      margin: 0.75rem 0 1.25rem 0;
+    }
+
+    .promo-badge strong {
+      display: block;
+      font-size: 2.75rem;
+      font-weight: 900;
+      color: var(--primary);
+      line-height: 1;
+      margin-bottom: 0.25rem;
+    }
+
+    .promo-badge span {
+      font-size: 0.95rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--foreground);
+    }
+
+    /* Vertical 9:16 PandaVideo Container */
+    .video-wrapper {
+      width: 100%;
+      max-width: 280px;
+      height: 440px;
+      max-height: 54vh;
+      aspect-ratio: 9/16;
+      margin: 0 auto;
+      border-radius: 1rem;
+      overflow: hidden;
+      background: #000;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.8), 0 0 0 1px var(--border);
+      position: relative;
+    }
+
+    .video-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+
+    /* CTA Button */
+    .event-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      max-width: 360px;
+      height: 3.5rem;
+      margin: 1.25rem auto 0 auto;
+      background: var(--primary);
+      color: var(--primary-foreground);
+      font-weight: 900;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-radius: 9999px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 10px 28px -4px oklch(83% 0.17 88 / 0.5);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .event-cta:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 32px -4px oklch(83% 0.17 88 / 0.7);
+      filter: brightness(1.08);
+    }
+
+    .event-cta:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Panels & Stats */
+    .panel {
+      border: 1px solid var(--border);
+      background: color-mix(in oklab, var(--card) 85%, transparent);
+      border-radius: 1.25rem;
+      box-shadow: var(--shadow-panel);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .tile {
+      border: 1px solid var(--border);
+      background: color-mix(in oklab, var(--secondary) 70%, transparent);
+      border-radius: 0.85rem;
+      padding: 0.65rem 0.5rem;
+    }
+
+    .stat-label {
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted-foreground);
+      font-size: 0.62rem;
+      font-weight: 700;
+    }
+
+    .stat-value {
+      font-size: 1.15rem;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    /* 3x3 Mines Grid */
+    .mines-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      padding: 1rem;
+      width: 100%;
+      max-width: 380px;
+      margin: 0.75rem auto;
+    }
+
+    .cell-btn {
+      position: relative;
+      aspect-ratio: 1;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 1rem;
+      font-weight: 900;
+      font-size: 1.6rem;
+      border: 1px solid transparent;
+      user-select: none;
+      cursor: pointer;
+      transition: all 0.25s ease-out;
+    }
+
+    .cell-closed {
+      background: var(--closed);
+      color: var(--foreground);
+      border-color: oklch(100% 0 0 / 0.15);
+      box-shadow: 0 8px 18px -4px rgba(0, 0, 0, 0.6);
+      animation: cell-invite 2.5s infinite ease-in-out;
+    }
+
+    .cell-closed:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.8);
+      filter: brightness(1.12);
+    }
+
+    .cell-closed:active {
+      transform: scale(0.96);
+    }
+
+    .cell-safe {
+      border-color: color-mix(in oklab, var(--safe) 80%, white 20%);
+      background: radial-gradient(140% 140% at 25% 20%, oklch(78% 0.2 145) 0%, var(--safe) 50%, oklch(58% 0.22 145) 100%);
+      color: var(--accent);
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.3), 0 0 24px -2px color-mix(in oklab, var(--safe) 85%, transparent);
+      animation: cell-reveal 0.35s ease-out forwards;
+    }
+
+    .cell-mine {
+      border-color: color-mix(in oklab, var(--destructive) 70%, transparent);
+      background: color-mix(in oklab, var(--destructive) 25%, var(--card));
+      color: var(--foreground);
+      font-size: 2rem;
+      box-shadow: 0 0 24px -4px color-mix(in oklab, var(--destructive) 75%, transparent);
+      animation: cell-reveal 0.35s ease-out forwards;
+    }
+
+    .cell-revealed-safe {
+      background: color-mix(in oklab, var(--card) 90%, transparent);
+      border-color: var(--border);
+      color: var(--safe);
+      font-size: 1.6rem;
+    }
+
+    @keyframes cell-invite {
+      0%, 70%, 100% { filter: brightness(1); transform: translateY(0) scale(1); }
+      78% { filter: brightness(1.18); transform: translateY(-3px) scale(1.035); }
+      86% { filter: brightness(1); transform: translateY(0) scale(1); }
+      93% { filter: brightness(1.08); transform: translateY(-1px) scale(1.015); }
+    }
+
+    @keyframes cell-reveal {
+      0% { filter: brightness(1.25); transform: scale(0.92); }
+      60% { transform: scale(1.04); }
+      100% { filter: brightness(1); transform: scale(1); }
+    }
+
+    .animate-btn-appear {
+      animation: popup-enter 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .cell-floating-gain {
+      position: absolute;
+      top: 10%;
+      left: 50%;
+      transform: translate(-50%, 0);
+      z-index: 10;
+      pointer-events: none;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--primary);
+      border-radius: 6px;
+      padding: 3px 6px;
+      font-size: 10px;
+      font-weight: 800;
+      white-space: nowrap;
+      animation: floating-gain 0.85s ease-out forwards;
+    }
+
+    @keyframes floating-gain {
+      0% { opacity: 0; transform: translate(-50%, 4px); }
+      20% { opacity: 1; }
+      70% { opacity: 1; }
+      100% { opacity: 0; transform: translate(-50%, -24px); }
+    }
+
+    /* Modal Popups */
+    .result-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      z-index: 100;
+      animation: fade-in 0.25s ease-out forwards;
+    }
+
+    @keyframes fade-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .result-popup {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 1.5rem;
+      padding: 2rem 1.5rem;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      box-shadow: 0 32px 90px -24px rgba(0, 0, 0, 0.95);
+      animation: popup-enter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      position: relative;
+    }
+
+    .result-popup-win {
+      border-color: color-mix(in oklab, var(--accent) 55%, var(--border));
+      box-shadow: 0 32px 90px -24px rgba(0, 0, 0, 0.95), var(--shadow-glow);
+    }
+
+    .result-popup-loss {
+      border-color: color-mix(in oklab, var(--destructive) 65%, var(--border));
+    }
+
+    @keyframes popup-enter {
+      0% { opacity: 0; transform: translateY(24px) scale(0.88); }
+      70% { opacity: 1; transform: translateY(-3px) scale(1.02); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .result-icon {
+      width: 4.25rem;
+      height: 4.25rem;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 900;
+      margin: 0 auto 1.25rem auto;
+    }
+
+    .result-icon-win {
+      background: linear-gradient(var(--primary), var(--primary));
+      color: var(--accent-foreground);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .result-icon-loss {
+      background: var(--destructive);
+      color: var(--destructive-foreground);
+      box-shadow: 0 0 24px -4px var(--destructive);
+    }
+
+    /* Confetti */
+    .confetti-container {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      top: -20px;
+      width: 9px;
+      height: 15px;
+      opacity: 0;
+      animation: confetti-fall 3.2s linear infinite;
+    }
+
+    @keyframes confetti-fall {
+      0% { opacity: 0; transform: translateY(-10px) rotate(0deg); }
+      15% { opacity: 1; }
+      100% { opacity: 0; transform: translate3d(var(--drift, 40px), 105vh, 0) rotate(720deg); }
+    }
+
+    /* Spinners & Ellipsis */
+    .event-loader {
+      width: 48px;
+      height: 48px;
+      border: 4px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .processing-ellipsis:after {
+      content: "";
+      width: 1.2em;
+      display: inline-block;
+      text-align: left;
+      animation: ellipsis 1.4s step-end infinite;
+    }
+
+    @keyframes ellipsis {
+      0% { content: ""; }
+      25% { content: "."; }
+      50% { content: ".."; }
+      75%, 100% { content: "..."; }
+    }
+
+    /* Footer */
+    footer.app-footer {
+      width: 100%;
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+
+    .footer-link {
+      background: transparent;
+      border: none;
+      color: var(--primary);
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    .footer-copy {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--muted-foreground);
+      margin-top: 0.4rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app"></div>
+
+  <!-- Privacy Dialog Modal -->
+  <dialog id="privacy-modal" class="result-backdrop" style="display: none; border: none; z-index: 300;">
+    <div class="result-popup text-left" style="max-height: 85vh; overflow-y: auto; text-align: left;">
+      <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); margin-bottom: 1rem;">
+        <h2 style="font-size: 1.1rem; font-weight: 800; color: var(--foreground);">Política de privacidade</h2>
+        <button onclick="closePrivacyModal()" style="color: var(--muted-foreground); font-size: 1.3rem; background: transparent; border: none; cursor: pointer; padding: 0.25rem;">✕</button>
+      </div>
+      <p style="font-size: 0.75rem; color: var(--muted-foreground); margin-bottom: 1rem;">Que dados recolhemos, para que os usamos e durante quanto tempo os guardamos.</p>
+      
+      <div style="display: flex; flex-direction: column; gap: 0.85rem; font-size: 0.78rem; line-height: 1.5; color: var(--foreground);">
+        <div>
+          <h3 style="font-weight: 800; font-size: 0.85rem; color: var(--primary); margin-bottom: 0.25rem;">Dados que recolhemos</h3>
+          <p style="color: var(--muted-foreground);">A imagem do comprovativo que carregas na página de levantamento; identificadores do anúncio e do teu navegador (cookies _fbp e _fbc, endereço IP, tipo de dispositivo e navegador); e a página de onde chegaste.</p>
+        </div>
+        <div>
+          <h3 style="font-weight: 800; font-size: 0.85rem; color: var(--primary); margin-bottom: 0.25rem;">Para que usamos esses dados</h3>
+          <p style="color: var(--muted-foreground);">Para validar a tua participação, evitar participações fraudulentas ou repetidas, e medir a eficácia dos anúncios que mostramos. Não usamos os teus dados para enviar publicidade não pedida.</p>
+        </div>
+        <div>
+          <h3 style="font-weight: 800; font-size: 0.85rem; color: var(--primary); margin-bottom: 0.25rem;">Com quem partilhamos</h3>
+          <p style="color: var(--muted-foreground);">Os dados ficam guardados num armazenamento privado acessível apenas pela nossa equipa. As ferramentas de medição de anúncios recebem apenas os identificadores técnicos necessários para contar uma participação, nunca o teu nome, número de telefone ou documentos.</p>
+        </div>
+        <div>
+          <h3 style="font-weight: 800; font-size: 0.85rem; color: var(--primary); margin-bottom: 0.25rem;">Durante quanto tempo guardamos</h3>
+          <p style="color: var(--muted-foreground);">Guardamos os dados enquanto o evento estiver a decorrer e enquanto for necessário para validar participações já feitas. Depois disso, os ficheiros e registos são eliminados.</p>
+        </div>
+        <div>
+          <h3 style="font-weight: 800; font-size: 0.85rem; color: var(--primary); margin-bottom: 0.25rem;">Os teus direitos</h3>
+          <p style="color: var(--muted-foreground);">Podes pedir para ver, corrigir ou eliminar os teus dados a qualquer momento, falando connosco através dos canais oficiais do evento. Também podes apagar os cookies do navegador para impedir a associação futura dos teus anúncios.</p>
+        </div>
+        <div>
+          <h3 style="font-weight: 800; font-size: 0.85rem; color: var(--primary); margin-bottom: 0.25rem;">Segurança</h3>
+          <p style="color: var(--muted-foreground);">Os ficheiros que envias ficam num espaço privado, não são publicados nem partilhados publicamente, e só a equipa do evento tem acesso a eles.</p>
+        </div>
+      </div>
+
+      <button onclick="closePrivacyModal()" class="event-cta" style="margin-top: 1.25rem; height: 2.85rem; font-size: 0.8rem;">Fechar</button>
+    </div>
+  </dialog>
+
+  <script>
+    // --- Configuration ---
+    const CHECKOUT_URL = 'https://pay.bicaju.com/e592144_610585';
+    const VIDEO_2_UNLOCK_SECONDS = 125; // 2 minutos e 5 segundos
+
+    // --- Web Audio API Sounds ---
+    let audioCtx = null;
+    let isMuted = false;
+    let bgmStopFn = null;
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) audioCtx = new AudioContext();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function playTone(freq, duration, delay = 0, type = 'sine') {
+      if (isMuted) return;
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const startTime = ctx.currentTime + delay;
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, startTime);
+      gain.gain.setValueAtTime(0.0001, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.16, startTime + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(startTime);
+      osc.stop(startTime + duration + 0.02);
+    }
+
+    function playSafeSound(step) {
+      playTone(440 + step * 85, 0.18, 0, 'sine');
+    }
+
+    function playWinFanfare() {
+      playTone(523, 0.25, 0, 'sine');
+      playTone(659, 0.28, 0.12, 'sine');
+      playTone(784, 0.45, 0.24, 'triangle');
+    }
+
+    function playMineExplosion() {
+      playTone(115, 0.45, 0, 'sawtooth');
+      playTone(72, 0.55, 0.08, 'square');
+    }
+
+    function startBackgroundMusic() {
+      if (bgmStopFn) return;
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      const masterGain = ctx.createGain();
+      masterGain.gain.value = isMuted ? 0 : 0.08;
+      const comp = ctx.createDynamicsCompressor();
+      masterGain.connect(comp);
+      comp.connect(ctx.destination);
+
+      const bassNotes = [130.81, 174.61, 196, 146.83];
+      const leadNotes = [0, 7, 12, 7, 3, 10, 7, 12];
+      const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.2, ctx.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < output.length; i++) output[i] = Math.random() * 2 - 1;
+
+      const playSynth = (f, time, dur, gainVal, shape) => {
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = shape;
+        osc.frequency.setValueAtTime(f, time);
+        g.gain.setValueAtTime(0.0001, time);
+        g.gain.exponentialRampToValueAtTime(gainVal, time + 0.008);
+        g.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+        osc.connect(g);
+        g.connect(masterGain);
+        osc.start(time);
+        osc.stop(time + dur + 0.01);
+      };
+
+      const playHihat = (time, isSnare) => {
+        const bs = ctx.createBufferSource();
+        const filter = ctx.createBiquadFilter();
+        const g = ctx.createGain();
+        bs.buffer = noiseBuffer;
+        filter.type = 'highpass';
+        filter.frequency.value = isSnare ? 1400 : 6500;
+        const dur = isSnare ? 0.14 : 0.04;
+        g.gain.setValueAtTime(isSnare ? 0.22 : 0.09, time);
+        g.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+        bs.connect(filter);
+        filter.connect(g);
+        g.connect(masterGain);
+        bs.start(time);
+        bs.stop(time + dur);
+      };
+
+      const playKick = (time) => {
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.frequency.setValueAtTime(150, time);
+        osc.frequency.exponentialRampToValueAtTime(45, time + 0.1);
+        g.gain.setValueAtTime(0.65, time);
+        g.gain.exponentialRampToValueAtTime(0.0001, time + 0.19);
+        osc.connect(g);
+        g.connect(masterGain);
+        osc.start(time);
+        osc.stop(time + 0.2);
+      };
+
+      let step = 0;
+      let nextTime = ctx.currentTime + 0.04;
+      const interval = setInterval(() => {
+        if (ctx.state !== 'running') return;
+        while (nextTime < ctx.currentTime + 0.15) {
+          const s = step % 16;
+          const bar = Math.floor(step / 16);
+          const base = bassNotes[bar % bassNotes.length];
+
+          if (s % 4 === 0) playKick(nextTime);
+          if (s === 4 || s === 12) playHihat(nextTime, true);
+          if (s % 2 === 0) playHihat(nextTime, false);
+          if ([0, 3, 6, 10, 14].includes(s)) playSynth(base / 2, nextTime, 0.16, 0.25, 'triangle');
+          if ([2, 5, 8, 11, 15].includes(s)) {
+            const semitone = leadNotes[(Math.floor(step / 2) + bar) % leadNotes.length];
+            playSynth(base * 2 * Math.pow(2, semitone / 12), nextTime, 0.12, 0.1, 'triangle');
+          }
+
+          step++;
+          nextTime += 0.15;
+        }
+      }, 25);
+
+      bgmStopFn = () => {
+        clearInterval(interval);
+        masterGain.disconnect();
+        comp.disconnect();
+        bgmStopFn = null;
+      };
+    }
+
+    function toggleMute() {
+      isMuted = !isMuted;
+      if (bgmStopFn) {
+        bgmStopFn();
+        if (!isMuted) startBackgroundMusic();
+      } else if (!isMuted) {
+        startBackgroundMusic();
+      }
+      render();
+    }
+
+    // --- Helpers ---
+    function formatKz(amount) {
+      return `${amount.toLocaleString('pt-PT').replace(/\s/g, '.')} Kz`;
+    }
+
+    // --- 5-Round Configuration ---
+    const roundsConfig = [
+      { isWin: true, safeValues: [1000, 850, 650], minePositions: [2, 5, 8] },
+      { isWin: false, safeValues: [1000], minePositions: [1, 5, 8] },
+      { isWin: true, safeValues: [1200, 800, 500], minePositions: [0, 4, 8] },
+      { isWin: true, safeValues: [900, 800, 800], minePositions: [3, 6, 8] },
+      { isWin: true, safeValues: [1100, 900, 500], minePositions: [1, 3, 7] }
+    ];
+
+    // --- App State ---
+    let state = {
+      route: '/',
+      initialProcessing: true,
+      roundIndex: 0,
+      totalWinnings: 0,
+      roundWinnings: 0,
+      safeOpenedCount: 0,
+      roundStatus: 'playing', // 'playing', 'revealing', 'round-over', 'finished'
+      roundOutcome: 'won',
+      cells: Array.from({ length: 9 }, () => ({ status: 'closed', value: 0 })),
+      totalWins: 0,
+      totalLosses: 0,
+      openingWithdrawalOverlay: false,
+      introButtonUnlocked: false,   // 'Jogar agora' só após o vídeo 1 terminar
+      videoButtonUnlocked: false    // 'Levantar os meus ganhos' só após 2m 5s (125s) no vídeo 2
+    };
+
+    function renderConfettiHTML() {
+      const colors = ['#f59e0b', '#10b981', '#3b82f6', '#ec4899', '#8b5cf6', '#eab308'];
+      let html = '<div class="confetti-container" aria-hidden="true">';
+      for (let i = 0; i < 24; i++) {
+        const left = Math.random() * 100;
+        const delay = Math.random() * 2.5;
+        const drift = (Math.random() - 0.5) * 160;
+        const color = colors[i % colors.length];
+        html += `<span class="confetti-piece" style="left: ${left}%; animation-delay: ${delay}s; --drift: ${drift}px; background-color: ${color};"></span>`;
+      }
+      html += '</div>';
+      return html;
+    }
+
+    function navigate(route) {
+      state.route = route;
+      if (route === '/jogo') {
+        startBackgroundMusic();
+      }
+      render();
+      window.scrollTo(0, 0);
+      setupPandaListeners();
+    }
+
+    function openPrivacyModal() {
+      const m = document.getElementById('privacy-modal');
+      m.style.display = 'flex';
+      m.showModal();
+    }
+
+    function closePrivacyModal() {
+      const m = document.getElementById('privacy-modal');
+      m.style.display = 'none';
+      m.close();
+    }
+
+    // --- Button Unlock Functions ---
+    function unlockIntroButton() {
+      if (state.introButtonUnlocked) return;
+      state.introButtonUnlocked = true;
+      const btn = document.getElementById('btn-jogar-agora');
+      if (btn) {
+        btn.style.display = 'inline-flex';
+        btn.classList.add('animate-btn-appear');
+      }
+    }
+
+    function unlockVideoButton() {
+      if (state.videoButtonUnlocked) return;
+      state.videoButtonUnlocked = true;
+      const btn = document.getElementById('btn-levantar-video');
+      if (btn) {
+        btn.style.display = 'inline-flex';
+        btn.classList.add('animate-btn-appear');
+      }
+    }
+
+    // --- PandaVideo Event Listener Setup ---
+    function setupPandaListeners() {
+      // 1. Hook via official PandaPlayer wrapper
+      window.pandascripttag = window.pandascripttag || [];
+      window.pandascripttag.push(function () {
+        if (state.route === '/') {
+          const introFrame = document.getElementById('panda-04763c07-8755-4ce1-9f1a-fda6c8d8eef6');
+          if (introFrame) {
+            try {
+              const pIntro = new PandaPlayer('panda-04763c07-8755-4ce1-9f1a-fda6c8d8eef6', {
+                onReady: () => {
+                  pIntro.onEvent(e => {
+                    if (e.message === 'panda_ended') {
+                      unlockIntroButton();
+                    }
+                  });
+                }
+              });
+            } catch(e) {}
+          }
+        } else if (state.route === '/video') {
+          const videoFrame = document.getElementById('panda-b04d43ec-d909-4e71-91ed-b98cd1902b43');
+          if (videoFrame) {
+            try {
+              const pVideo = new PandaPlayer('panda-b04d43ec-d909-4e71-91ed-b98cd1902b43', {
+                onReady: () => {
+                  pVideo.onEvent(e => {
+                    if (e.message === 'panda_ended') {
+                      unlockVideoButton();
+                    }
+                  });
+                }
+              });
+            } catch(e) {}
+          }
+        }
+      });
+    }
+
+    // 2. Direct native postMessage listener (Captures every event from iframe without dependencies)
+    let video1Timer = null;
+    let video2Timer = null;
+
+    window.addEventListener('message', function (event) {
+      let data = event.data;
+      if (typeof data === 'string') {
+        try {
+          data = JSON.parse(data);
+        } catch (e) {}
+      }
+      if (!data) return;
+
+      const msg = data.message || data.event || data.type || (data.data && (data.data.message || data.data.event));
+      const current = data.currentTime ?? data.data?.currentTime ?? data.time ?? 0;
+      const dur = data.duration ?? data.data?.duration ?? 0;
+
+      // Video 1 (Intro) - O botão JOGAR AGORA só aparece quando o vídeo terminar
+      if (state.route === '/') {
+        if (msg === 'panda_play' || msg === 'play') {
+          if (!video1Timer) {
+            // Silencioso em segundo plano para garantir liberação quando o vídeo de 15s acabar
+            video1Timer = setTimeout(() => {
+              unlockIntroButton();
+            }, 16000);
+          }
+        }
+        if (msg === 'panda_ended' || msg === 'ended' || msg === 'finish') {
+          unlockIntroButton();
+        } else if (msg === 'panda_timeupdate' || msg === 'timeupdate') {
+          if (dur > 0 && current >= dur - 0.5) {
+            unlockIntroButton();
+          }
+        }
+      }
+
+      // Video 2 (Levantamento) - O botão LEVANTAR OS GANHOS só aparece quando o vídeo terminar
+      if (state.route === '/video') {
+        if (msg === 'panda_ended' || msg === 'ended' || msg === 'finish') {
+          unlockVideoButton();
+        } else if (msg === 'panda_timeupdate' || msg === 'timeupdate') {
+          if (dur > 0 && current >= dur - 0.5) {
+            unlockVideoButton();
+          }
+        }
+      }
+    });
+
+    // --- Mines Game Interaction ---
+    function handleCellClick(index) {
+      if (state.roundStatus !== 'playing') return;
+      const cell = state.cells[index];
+      if (cell.status !== 'closed') return;
+
+      const currentRound = roundsConfig[Math.min(state.roundIndex, 4)];
+      const stepIndex = state.safeOpenedCount;
+      const safeVal = currentRound.safeValues[stepIndex];
+
+      if (safeVal === undefined) {
+        // Mine hit
+        state.cells[index] = { status: 'mine' };
+        state.cells = state.cells.map((c, i) => {
+          if (i === index) return { status: 'mine' };
+          if (c.status === 'closed') {
+            return currentRound.minePositions.includes(i) ? { status: 'mine' } : { status: 'revealed-safe' };
+          }
+          return c;
+        });
+        state.roundWinnings = 0;
+        state.totalLosses++;
+        state.roundOutcome = 'lost';
+        state.roundStatus = 'revealing';
+        playMineExplosion();
+        render();
+
+        setTimeout(() => {
+          state.roundStatus = 'round-over';
+          render();
+        }, 1200);
+        return;
+      }
+
+      // Safe cell opened
+      state.safeOpenedCount++;
+      state.roundWinnings += safeVal;
+      state.cells[index] = { status: 'safe', value: safeVal };
+
+      if (state.safeOpenedCount >= 3) {
+        state.totalWinnings += state.roundWinnings;
+        state.totalWins++;
+        state.roundOutcome = 'won';
+        state.cells = state.cells.map((c, i) => {
+          if (c.status === 'closed') {
+            return currentRound.minePositions.includes(i) ? { status: 'mine' } : { status: 'revealed-safe' };
+          }
+          return c;
+        });
+        state.roundStatus = 'revealing';
+        playWinFanfare();
+        render();
+
+        setTimeout(() => {
+          state.roundStatus = (state.roundIndex === 4) ? 'finished' : 'round-over';
+          render();
+        }, 1200);
+      } else {
+        playSafeSound(state.safeOpenedCount);
+        render();
+      }
+    }
+
+    function nextRound() {
+      if (state.roundIndex >= 4) {
+        state.roundStatus = 'finished';
+        render();
+        return;
+      }
+      state.roundIndex++;
+      state.safeOpenedCount = 0;
+      state.roundWinnings = 0;
+      state.roundStatus = 'playing';
+      state.cells = Array.from({ length: 9 }, () => ({ status: 'closed', value: 0 }));
+      render();
+    }
+
+    function handleFinishWithdrawClick() {
+      state.openingWithdrawalOverlay = true;
+      render();
+      setTimeout(() => {
+        state.openingWithdrawalOverlay = false;
+        navigate('/video');
+      }, 3500);
+    }
+
+    function handleDirectCheckout() {
+      window.location.href = CHECKOUT_URL;
+    }
+
+    // --- RENDER VIEWS ---
+    function render() {
+      const app = document.getElementById('app');
+
+      if (state.route === '/') {
+        renderHome(app);
+      } else if (state.route === '/jogo') {
+        renderJogo(app);
+      } else if (state.route === '/video') {
+        renderVideo(app);
+      }
+    }
+
+    // 1. Home / Presentation View
+    function renderHome(container) {
+      if (state.initialProcessing) {
+        container.innerHTML = `
+          <main class="page-layout event-bg">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem; text-align: center;">
+              <div class="event-loader"></div>
+              <p style="font-size: 0.9rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.12em; color: var(--foreground);">
+                A validar sua participação<span class="processing-ellipsis"></span>
+              </p>
+            </div>
+          </main>
+        `;
+        return;
+      }
+
+      container.innerHTML = `
+        <main class="page-layout event-bg">
+          ${renderConfettiHTML()}
+          
+          <div class="app-card">
+            
+            <!-- Dica de teste: duplo clique no título destrava o botão imediatamente -->
+            <h1 class="hero-title" ondblclick="unlockIntroButton()" title="Parabéns!">Parabéns!</h1>
+            
+            <div class="promo-badge">
+              <strong>5</strong>
+              <span>Partidas gratuitas</span>
+            </div>
+
+            <!-- Vertical 9:16 Video Player -->
+            <div class="video-wrapper">
+              <iframe 
+                id="panda-04763c07-8755-4ce1-9f1a-fda6c8d8eef6"
+                src="https://player-vz-dbcdd112-1e6.tv.pandavideo.com/embed/?v=04763c07-8755-4ce1-9f1a-fda6c8d8eef6" 
+                title="Vídeo de apresentação" 
+                allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture" 
+                allowfullscreen="true">
+              </iframe>
+            </div>
+
+            <!-- O botão JOGAR AGORA só aparece após o vídeo terminar -->
+            <button 
+              id="btn-jogar-agora"
+              type="button" 
+              onclick="navigate('/jogo')" 
+              class="event-cta"
+              style="display: ${state.introButtonUnlocked ? 'inline-flex' : 'none'};">
+              Jogar agora 
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+            </button>
+
+
+
+            <footer class="app-footer">
+              <button type="button" onclick="openPrivacyModal()" class="footer-link">Política de privacidade</button>
+              <p class="footer-copy">Evento promocional</p>
+            </footer>
+
+          </div>
+        </main>
+      `;
+    }
+
+    // 2. Mines Game View
+    function renderJogo(container) {
+      let modalHTML = '';
+
+      if (state.roundStatus === 'round-over') {
+        const isWin = state.roundOutcome === 'won';
+        modalHTML = `
+          <div class="result-backdrop" role="presentation">
+            ${isWin ? renderConfettiHTML() : ''}
+            <div class="result-popup ${isWin ? 'result-popup-win' : 'result-popup-loss'}">
+              <div class="result-icon ${isWin ? 'result-icon-win' : 'result-icon-loss'}">
+                ${isWin ? '✓' : '✕'}
+              </div>
+              <p class="stat-label">${isWin ? 'Objetivo concluído' : 'Fim da partida'}</p>
+              <h2 style="margin-top: 0.5rem; font-size: 1.65rem; font-weight: 900; text-transform: uppercase; color: ${isWin ? 'var(--accent)' : 'var(--destructive)'};">
+                ${isWin ? 'Desafio concluído!' : 'Encontrou uma mina'}
+              </h2>
+              ${isWin ? `
+                <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--muted-foreground);">Valor acumulado nesta partida</p>
+                <p style="margin-top: 0.25rem; font-size: 2.25rem; font-weight: 900; color: var(--accent);">${formatKz(state.roundWinnings)}</p>
+              ` : `
+                <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--muted-foreground);">Esta partida terminou sem acrescentar valor ao total.</p>
+              `}
+              <button type="button" onclick="nextRound()" class="event-cta" style="margin-top: 1.5rem; height: 3rem;">
+                ${state.roundIndex >= 4 ? 'Ver resumo' : 'Próxima partida'}
+              </button>
+            </div>
+          </div>
+        `;
+      } else if (state.roundStatus === 'finished') {
+        modalHTML = `
+          <div class="result-backdrop" role="dialog" aria-modal="true">
+            <div class="result-popup result-popup-win">
+              <h2 style="font-size: 1.65rem; font-weight: 900; color: var(--primary);">Concluiu as suas partidas</h2>
+              <p style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--muted-foreground);">O desafio de aniversário terminou. Consulte o resultado da sua participação.</p>
+              
+              <div style="margin-top: 1.25rem; display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.65rem;">
+                <div class="tile">
+                  <p class="stat-label">Partidas</p>
+                  <p class="stat-value">5</p>
+                </div>
+                <div class="tile">
+                  <p class="stat-label">Vitórias</p>
+                  <p class="stat-value" style="color: var(--accent);">${state.totalWins}</p>
+                </div>
+                <div class="tile">
+                  <p class="stat-label">Minas encontradas</p>
+                  <p class="stat-value" style="color: var(--destructive);">${state.totalLosses}</p>
+                </div>
+                <div class="tile">
+                  <p class="stat-label">Total acumulado</p>
+                  <p class="stat-value" style="color: var(--accent);">${formatKz(state.totalWinnings)}</p>
+                </div>
+              </div>
+
+              <button type="button" onclick="handleFinishWithdrawClick()" ${state.openingWithdrawalOverlay ? 'disabled' : ''} class="event-cta" style="margin-top: 1.75rem;">
+                Levantar os meus ganhos
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      const overlayHTML = state.openingWithdrawalOverlay ? `
+        <div class="result-backdrop" style="background: rgba(0,0,0,0.92); z-index: 150;">
+          <div style="text-align: center;">
+            <div class="event-loader" style="margin-bottom: 1rem;"></div>
+            <p style="font-size: 1.15rem; font-weight: 800; color: var(--foreground);">A abrir a página de levantamento…</p>
+            <p style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--muted-foreground);">Aguarde, não feche esta janela.</p>
+          </div>
+        </div>
+      ` : '';
+
+      container.innerHTML = `
+        <main class="page-layout mines-bg">
+          <div class="app-card" style="max-width: 440px;">
+            
+            <!-- Mute Audio Button -->
+            <div style="width: 100%; display: flex; justify-content: flex-end; margin-bottom: 0.5rem;">
+              <button onclick="toggleMute()" style="background: transparent; border: none; color: var(--muted-foreground); cursor: pointer; padding: 0.4rem;" title="${isMuted ? 'Ativar música' : 'Silenciar música'}">
+                ${isMuted ? `
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"></path><line x1="22" x2="16" y1="9" y2="15"></line><line x1="16" x2="22" y1="9" y2="15"></line></svg>
+                ` : `
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"></path><path d="M16 9a5 5 0 0 1 0 6"></path><path d="M19.364 18.364a9 9 0 0 0 0-12.728"></path></svg>
+                `}
+              </button>
+            </div>
+
+            <!-- Stats Bar -->
+            <header style="width: 100%; display: flex; flex-direction: column; gap: 0.75rem;">
+              <div style="display: flex; justify-content: flex-end;">
+                <div class="panel" style="display: flex; align-items: center; gap: 1rem; padding: 0.5rem 1rem;">
+                  <div style="display: flex; flex-direction: column; align-items: center;">
+                    <p class="stat-label">Partida</p>
+                    <p class="stat-value" style="font-size: 0.95rem;">${Math.min(state.roundIndex + 1, 5)} / 5</p>
+                  </div>
+                  <div style="height: 24px; width: 1px; background: var(--border);"></div>
+                  <div style="display: flex; flex-direction: column; align-items: center;">
+                    <p class="stat-label">Total acumulado</p>
+                    <p class="stat-value" style="font-size: 0.95rem; color: var(--accent);">${formatKz(state.totalWinnings)}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 0.5rem;">
+                <div class="panel" style="padding: 0.4rem 0.75rem; text-align: center;">
+                  <p class="stat-label">Jogadas</p>
+                  <p class="stat-value" style="font-size: 0.85rem;">${state.safeOpenedCount} / 3</p>
+                </div>
+                <h1 style="font-size: 2.1rem; font-weight: 900; text-transform: uppercase; color: var(--primary); letter-spacing: 0.05em;">
+                  Mines
+                </h1>
+                <div class="panel" style="padding: 0.4rem 0.75rem; text-align: center;">
+                  <p class="stat-label">Valor da partida</p>
+                  <p class="stat-value" style="font-size: 0.85rem; color: var(--accent);">${formatKz(state.roundWinnings)}</p>
+                </div>
+              </div>
+            </header>
+
+            <!-- 3x3 Grid -->
+            <div class="panel mines-grid">
+              ${state.cells.map((cell, idx) => {
+                if (cell.status === 'closed') {
+                  return `
+                    <button type="button" onclick="handleCellClick(${idx})" class="cell-btn cell-closed" aria-label="Abrir casa">
+                      ?
+                    </button>
+                  `;
+                } else if (cell.status === 'mine') {
+                  return `
+                    <div class="cell-btn cell-mine">💣</div>
+                  `;
+                } else if (cell.status === 'revealed-safe') {
+                  return `
+                    <div class="cell-btn cell-revealed-safe">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>
+                    </div>
+                  `;
+                } else {
+                  return `
+                    <div class="cell-btn cell-safe">
+                      <span style="font-size: 0.85rem; line-height: 1;">${formatKz(cell.value)}</span>
+                      <span class="cell-floating-gain">+${formatKz(cell.value)}</span>
+                    </div>
+                  `;
+                }
+              }).join('')}
+            </div>
+
+            ${state.roundStatus === 'playing' ? `
+              <p style="font-size: 0.75rem; color: var(--muted-foreground); margin-top: 0.25rem;">
+                Abra mais ${3 - state.safeOpenedCount} casa(s) segura(s) para concluir a partida.
+              </p>
+            ` : ''}
+
+            <footer class="app-footer">
+              <button type="button" onclick="openPrivacyModal()" class="footer-link">Política de privacidade</button>
+              <p class="footer-copy">Evento promocional</p>
+            </footer>
+
+          </div>
+          ${modalHTML}
+          ${overlayHTML}
+        </main>
+      `;
+    }
+
+    // 3. Video de Levantamento View
+    function renderVideo(container) {
+      container.innerHTML = `
+        <main class="page-layout mines-bg">
+          <div class="app-card">
+            
+            <!-- Dica de teste: duplo clique no título destrava o botão imediatamente -->
+            <h1 class="hero-title" ondblclick="unlockVideoButton()" title="Vídeo de levantamento" style="margin-bottom: 1.25rem;">
+              Vídeo de levantamento
+            </h1>
+            
+            <!-- Vertical 9:16 Video Player -->
+            <div class="video-wrapper">
+              <iframe 
+                id="panda-b04d43ec-d909-4e71-91ed-b98cd1902b43"
+                src="https://player-vz-dbcdd112-1e6.tv.pandavideo.com/embed/?v=b04d43ec-d909-4e71-91ed-b98cd1902b43" 
+                title="Vídeo de levantamento" 
+                allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture" 
+                allowfullscreen="true">
+              </iframe>
+            </div>
+
+            <!-- O botão LEVANTAR OS MEUS GANHOS só aparece após 2 minutos e 5 segundos (125 segundos) -->
+            <button 
+              id="btn-levantar-video"
+              type="button" 
+              onclick="handleDirectCheckout()" 
+              class="event-cta"
+              style="display: ${state.videoButtonUnlocked ? 'inline-flex' : 'none'};">
+              Levantar os meus ganhos
+            </button>
+
+
+
+            <footer class="app-footer">
+              <button type="button" onclick="openPrivacyModal()" class="footer-link">Política de privacidade</button>
+              <p class="footer-copy">Evento promocional</p>
+            </footer>
+
+          </div>
+        </main>
+      `;
+    }
+
+    // Initialize safely even if DOM is already loaded or cached
+    function initApp() {
+      render();
+      setTimeout(() => {
+        state.initialProcessing = false;
+        try { playWinFanfare(); } catch(e) {}
+        render();
+        setupPandaListeners();
+      }, 1800);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initApp);
+    } else {
+      initApp();
+    }
+  </script>
+</body>
+</html>
